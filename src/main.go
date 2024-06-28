@@ -1,11 +1,9 @@
 package main
 
 import (
-	"fmt"
-	"main/plugins"
+	"main/api"
 )
 
 func main() {
-	fmt.Println("Hello, World!")
-	plugins.LoadPlugins()
+	api.StartServer()
 }
