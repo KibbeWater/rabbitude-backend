@@ -14,14 +14,14 @@ go build -o ../bin/main main.go
 cd ..
 
 # Build plugins
-echo "Building plugins..."
+# echo "Building plugins..."
 
-for plugin in plugins/*; do
-    if [ -d "$plugin" ]; then
-        plugin_name=$(basename "$plugin")
-        echo "Building $plugin_name..."
-        go build -buildmode=plugin -o bin/plugins/${plugin_name}.so ./$plugin/main.go
-    fi
-done
+# for plugin in plugins/*; do
+#     if [ -d "$plugin" ]; then
+#         plugin_name=$(basename "$plugin")
+#         echo "Building $plugin_name..."
+#         go build -buildmode=plugin -o bin/plugins/${plugin_name}.so ./$plugin/main.go
+#     fi
+# done
 
 echo "Build complete."

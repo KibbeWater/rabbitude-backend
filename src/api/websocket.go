@@ -3,6 +3,7 @@ package api
 import (
 	"encoding/json"
 	"log"
+	"main/structures"
 	"net/http"
 
 	"github.com/gorilla/websocket"
@@ -12,17 +13,6 @@ type webSocketHandler struct {
 	upgrader websocket.Upgrader
 }
 
-type Client struct {
-	conn       *websocket.Conn
-	imei       string
-	accountKey string
-}
-
-type ServiceRequest struct {
-	client *Client
-	data   []byte
-}
-
 func (wsh webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ws, err := wsh.upgrader.Upgrade(w, r, nil)
 	if err != nil {
@@ -30,16 +20,16 @@ func (wsh webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	client := Client{
-		conn: ws,
+	client := structures.Client{
+		Conn: ws,
 	}
 
 	go handleMessages(client)
 }
 
-func handleMessages(client Client) {
+func handleMessages(client structures.Client) {
 	for {
-		msgType, msg, err := client.conn.ReadMessage()
+		msgType, msg, err := client.Conn.ReadMessage()
 		if err != nil {
 			log.Printf("error %s when reading message", err)
 			break
@@ -60,7 +50,7 @@ func handleMessages(client Client) {
 	}
 }
 
-func parseJson(msg []byte, client Client) {
+func parseJson(msg []byte, client structures.Client) {
 	// parse the json object into a map
 	var jsonMap map[string]interface{}
 	err := json.Unmarshal(msg, &jsonMap)
@@ -69,9 +59,9 @@ func parseJson(msg []byte, client Client) {
 		return
 	}
 
-	req := ServiceRequest{
-		client: &client,
-		data:   msg,
+	req := structures.ServiceRequest{
+		Client: &client,
+		Data:   msg,
 	}
 
 	// is the top-level object key "global" exists?

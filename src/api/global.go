@@ -3,32 +3,14 @@ package api
 import (
 	"encoding/json"
 	"log"
+	"main/structures"
 	"strings"
 )
 
-type LoginData struct {
-	Global struct {
-		Initialize struct {
-			DeviceId  string `json:"deviceId"`
-			Evaluate  bool   `json:"evaluate"`
-			Greet     bool   `json:"greet"`
-			Language  string `json:"language"`
-			Listening bool   `json:"listening"`
-			Location  struct {
-				Latitude  float64 `json:"latitude"`
-				Longitude float64 `json:"longitude"`
-			} `json:"location"`
-			MimeType string `json:"mimeType"`
-			TimeZone string `json:"timeZone"`
-			Token    string `json:"token"`
-		} `json:"initialize"`
-	} `json:"global"`
-}
-
-func HandleGlobal(req ServiceRequest) {
+func HandleGlobal(req structures.ServiceRequest) {
 	// Unmarshal the JSON obj from req.data
 	var jsonMap map[string]interface{}
-	err := json.Unmarshal(req.data, &jsonMap)
+	err := json.Unmarshal(req.Data, &jsonMap)
 	if err != nil {
 		log.Printf("error %s when parsing json", err)
 		return
@@ -37,14 +19,14 @@ func HandleGlobal(req ServiceRequest) {
 	for key := range jsonMap["global"].(map[string]interface{}) {
 		switch key {
 		case "initialize":
-			var loginData LoginData
-			err := json.Unmarshal(req.data, &loginData)
+			var loginData structures.LoginRequest
+			err := json.Unmarshal(req.Data, &loginData)
 			if err != nil {
 				log.Printf("error %s when parsing json", err)
 				return
 			}
 
-			req.client.imei = loginData.Global.Initialize.DeviceId
+			req.Client.Imei = loginData.Global.Initialize.DeviceId
 
 			tokenParts := strings.Split(loginData.Global.Initialize.Token, "+")
 			if len(tokenParts) != 2 {
@@ -52,7 +34,7 @@ func HandleGlobal(req ServiceRequest) {
 				return
 			}
 
-			req.client.accountKey = tokenParts[1]
+			req.Client.AccountKey = tokenParts[1]
 		}
 	}
 }

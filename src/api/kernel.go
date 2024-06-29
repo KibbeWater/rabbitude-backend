@@ -3,20 +3,16 @@ package api
 import (
 	"encoding/json"
 	"log"
+	"main/structures"
 )
 
-type UserTextRequest struct {
-	Kernel struct {
-		UserText struct {
-			Text string `json:"text"`
-		} `json:"userText"`
-	} `json:"kernel"`
-}
+type ServiceRequest = structures.ServiceRequest
+type UserTextRequest = structures.UserTextRequest
 
 func HandleKernel(req ServiceRequest) {
 	// Unmarshal the JSON obj from req.data
 	var jsonMap map[string]interface{}
-	err := json.Unmarshal(req.data, &jsonMap)
+	err := json.Unmarshal(req.Data, &jsonMap)
 	if err != nil {
 		log.Printf("error %s when parsing json", err)
 		return
@@ -26,7 +22,7 @@ func HandleKernel(req ServiceRequest) {
 		switch key {
 		case "userText":
 			var userTextReq UserTextRequest
-			err := json.Unmarshal(req.data, &userTextReq)
+			err := json.Unmarshal(req.Data, &userTextReq)
 			if err != nil {
 				log.Printf("error %s when parsing json", err)
 				return
