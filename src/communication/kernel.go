@@ -4,7 +4,6 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"main/api"
 	"main/services"
 	"main/structures"
 )
@@ -50,11 +49,14 @@ func HandleKernel(req ServiceRequest) {
 				return
 			}
 
-			fmt.Println(voiceState)
+			if voiceState == structures.VOICE_ACTIVITY_PRESSED {
+				fmt.Println("Clearing audio buffer, voice activity pressed")
+				req.Client.AudioBuf = []byte{}
+			}
 
 			if voiceState == structures.VOICE_ACTIVITY_RELEASED {
 				fmt.Println("Sending audio response")
-				api.SendAudioResponse(req.Client, []byte(`123`), "response")
+				go services.RunSpeech(req.Client, req.Client.AudioBuf)
 			}
 		}
 	}

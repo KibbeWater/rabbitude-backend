@@ -75,7 +75,9 @@ func ollamaSetup() {
 	config.SaveProviderConfig(cfg)
 }
 
-func ollamaBase(client *structures.Client, text string) {
+func ollamaBase(client *structures.Client, data []byte) {
+	text := string(data)
+
 	fmt.Println("Running Ollama base service")
 	llm, err := ollama.New(ollama.WithModel(ollama_quick_model))
 	if err != nil {
@@ -126,7 +128,9 @@ func ollamaBase(client *structures.Client, text string) {
 	}
 }
 
-func ollamaLLM(client *structures.Client, text string) {
+func ollamaLLM(client *structures.Client, data []byte) {
+	text := string(data)
+
 	fmt.Println("Running Ollama LLM service")
 	llm, err := ollama.New(ollama.WithModel(ollama_deep_model))
 	if err != nil {
@@ -151,6 +155,6 @@ func ollamaLLM(client *structures.Client, text string) {
 	services.RunTTS(client, completion)
 }
 
-func runUber(client *structures.Client, text string) {
+func runUber(client *structures.Client, data []byte) {
 	api.SendTextResponse(client, "No taxi for you lol")
 }

@@ -30,6 +30,17 @@ func SendTextResponse(client *structures.Client, text string) {
 	client.Conn.WriteJSON(response)
 }
 
+func SendSpeechRecognised(client *structures.Client, text string) {
+	response := map[string]interface{}{
+		"speechRecognized": map[string]interface{}{
+			"Recognized": true,
+			"Text":       text,
+		},
+	}
+
+	client.Conn.WriteJSON(response)
+}
+
 func SendAudioResponse(client *structures.Client, audio []byte, text string) {
 	// Base64 encode the audio
 	audioBase64 := base64.StdEncoding.EncodeToString(audio)

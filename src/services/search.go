@@ -10,5 +10,5 @@ func RunSearch(client *structures.Client, text string) {
 		return
 	}
 
-	config.BaseSearch.Run(client, text)
+	config.BaseSearch.Run(client, []byte(text))
 }

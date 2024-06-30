@@ -73,7 +73,9 @@ func elevenlabsSetup() {
 	config.SaveProviderConfig(cfg)
 }
 
-func elevenlabsTTS(client *structures.Client, text string) {
+func elevenlabsTTS(client *structures.Client, data []byte) {
+	text := string(data)
+
 	// Create a HTTP post request to the ElevenLabs TTS API
 	url := fmt.Sprintf("https://api.elevenlabs.io/v1/text-to-speech/%s/stream/with-timestamps", elevenlabsVoiceID)
 	headers := map[string]string{
@@ -190,12 +192,16 @@ func elevenlabsTTS(client *structures.Client, text string) {
 		log.Fatal(err)
 	}
 
-	audioPath := fmt.Sprintf("%s/tts.mp3", exeDir)
+	// mp3Filename
+	mp3Filename := utils.GenerateUniqueID()
+	wavFilename := utils.GenerateUniqueID()
+
+	audioPath := fmt.Sprintf("%s/%s.mp3", exeDir, mp3Filename)
 	if err := os.WriteFile(audioPath, audioBytes, 0644); err != nil {
 		log.Fatal(err)
 	}
 
-	newAudioPath := fmt.Sprintf("%s/tts.wav", exeDir)
+	newAudioPath := fmt.Sprintf("%s/%s.wav", exeDir, wavFilename)
 
 	// ffmpeg command: ffmpeg -i tts.mp3 -acodec pcm_s16le -ar 16000 -ac 1 tts.wav
 	err = ffmpeg.Input(audioPath).Output(newAudioPath, ffmpeg.KwArgs{

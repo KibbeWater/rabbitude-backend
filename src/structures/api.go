@@ -8,6 +8,9 @@ type Client struct {
 	Conn       *websocket.Conn
 	Imei       string
 	AccountKey string
+
+	IsLoggedIn bool
+	AudioBuf   []byte
 }
 
 type ServiceRequest struct {

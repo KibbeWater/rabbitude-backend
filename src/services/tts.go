@@ -17,5 +17,5 @@ func RunTTS(client *structures.Client, text string) {
 	}
 
 	fmt.Println("Running TTS on text: ", text)
-	config.BaseTTS.Run(client, text)
+	config.BaseTTS.Run(client, []byte(text))
 }

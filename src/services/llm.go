@@ -17,5 +17,5 @@ func RunLLM(client *structures.Client, text string) {
 	}
 
 	fmt.Println("Running LLM on text: ", text)
-	config.BaseLLM.Run(client, text)
+	config.BaseLLM.Run(client, []byte(text))
 }

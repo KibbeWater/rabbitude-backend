@@ -1,6 +1,6 @@
 package structures
 
-type ServiceFunction func(client *Client, text string)
+type ServiceFunction func(client *Client, data []byte)
 type Service struct {
 	Provider Provider
 

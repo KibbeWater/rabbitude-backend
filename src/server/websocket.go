@@ -2,6 +2,7 @@ package server
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"main/communication"
 	"main/config"
@@ -24,13 +25,16 @@ func (wsh webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	client := structures.Client{
-		Conn: ws,
+		Conn:       ws,
+		Imei:       "",
+		AccountKey: "",
+		IsLoggedIn: false,
 	}
 
-	go handleMessages(client)
+	go handleMessages(&client)
 }
 
-func handleMessages(client structures.Client) {
+func handleMessages(client *structures.Client) {
 	for {
 		msgType, msg, err := client.Conn.ReadMessage()
 		if err != nil {
@@ -38,8 +42,11 @@ func handleMessages(client structures.Client) {
 			break
 		}
 
+		fmt.Println("Received message: ", msgType)
+
 		if msgType == websocket.BinaryMessage {
-			// We are streaming audio data, ignore this for now
+			fmt.Println("Received binary frame")
+			go communication.HandleAudioData(client, msg)
 			continue
 		}
 
@@ -53,7 +60,7 @@ func handleMessages(client structures.Client) {
 	}
 }
 
-func parseJson(msg []byte, client structures.Client) {
+func parseJson(msg []byte, client *structures.Client) {
 	// parse the json object into a map
 	var jsonMap map[string]interface{}
 	err := json.Unmarshal(msg, &jsonMap)
@@ -63,19 +70,19 @@ func parseJson(msg []byte, client structures.Client) {
 	}
 
 	req := structures.ServiceRequest{
-		Client: &client,
+		Client: client,
 		Data:   msg,
 	}
 
 	// is the top-level object key "global" exists?
 	if _, ok := jsonMap["global"]; ok {
-		communication.HandleGlobal(req)
+		go communication.HandleGlobal(req)
 		return
 	}
 
 	// is the top-level object key "kernel" exists?
 	if _, ok := jsonMap["kernel"]; ok {
-		communication.HandleKernel(req)
+		go communication.HandleKernel(req)
 		return
 	}
 }

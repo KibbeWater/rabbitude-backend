@@ -2,6 +2,7 @@ package communication
 
 import (
 	"encoding/json"
+	"fmt"
 	"log"
 	"main/api"
 	"main/structures"
@@ -27,6 +28,9 @@ func HandleGlobal(req structures.ServiceRequest) {
 				return
 			}
 
+			// Print the login data
+			log.Printf("Login data: %+v", loginData)
+
 			req.Client.Imei = loginData.Global.Initialize.DeviceId
 
 			tokenParts := strings.Split(loginData.Global.Initialize.Token, "+")
@@ -36,6 +40,10 @@ func HandleGlobal(req structures.ServiceRequest) {
 			}
 
 			req.Client.AccountKey = tokenParts[1]
+
+			req.Client.IsLoggedIn = true
+
+			fmt.Println(req.Client)
 
 			api.SendInitResponse(req.Client)
 		}

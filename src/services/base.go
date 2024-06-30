@@ -15,5 +15,5 @@ func ClassifyText(client *structures.Client, text string) {
 		fmt.Println("No base provider found")
 		return
 	}
-	config.ServiceBase.Run(client, text)
+	config.ServiceBase.Run(client, []byte(text))
 }
