@@ -21,7 +21,7 @@ If you have any suggestions or ideas, you are free to modify this document and s
 
 ### Providers
 
-- [ ] Add Groq Provider (LLMs / Speech services)
+- [x] Add Groq Provider (LLMs / Speech services)
 - [ ] Add OpenAI Providers (GPT-3.5/4/4o, Whisper, etc.)
 - [ ] Add a "Search" Provider (Perplexity?)
 - [ ] On-Device Text-to-Speech Provider

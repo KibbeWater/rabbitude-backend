@@ -91,7 +91,7 @@ func ollamaBase(client *structures.Client, data []byte) {
 		log.Fatal(err)
 	}
 
-	query := utils.BuildClassificationPrompt()
+	query := utils.BuildClassificationPrompt(utils.SequenceReturnPrompt("&s", "&e"))
 	query = fmt.Sprintf("%s\nWhat intention does this query have: %s", query, text)
 
 	fmt.Println("Query: ", query)

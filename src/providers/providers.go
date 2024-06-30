@@ -11,6 +11,33 @@ import (
 type Service = structures.Service
 type BaseService = structures.BaseService
 
+// Returns a list of unique providers and a list of services.
+func DiscoverServices() ([]string, []BaseService, []Service) {
+	var baseServices []BaseService
+	var services []Service
+
+	RegisterOllama(&baseServices, &services)
+	RegisterElevenlabs(&baseServices, &services)
+	RegisterWhisper(&baseServices, &services)
+	RegisterGroq(&baseServices, &services)
+
+	// Find all unique providers
+	providerMap := make(map[string]bool)
+	for _, baseService := range baseServices {
+		providerMap[baseService.Provider.ProviderName] = true
+	}
+	for _, service := range services {
+		providerMap[service.Provider.ProviderName] = true
+	}
+
+	providers := make([]string, 0, len(providerMap))
+	for provider := range providerMap {
+		providers = append(providers, provider)
+	}
+
+	return providers, baseServices, services
+}
+
 func InstallServices() {
 	cfg := config.GetConfig()
 	_, baseServices, _ := DiscoverServices()
@@ -206,30 +233,4 @@ func findProvidersByTypeName(serviceType string, services []Service) []Service {
 	}
 
 	return providers
-}
-
-// Returns a list of unique providers and a list of services.
-func DiscoverServices() ([]string, []BaseService, []Service) {
-	var baseServices []BaseService
-	var services []Service
-
-	RegisterOllama(&baseServices, &services)
-	RegisterElevenlabs(&baseServices, &services)
-	RegisterWhisper(&baseServices, &services)
-
-	// Find all unique providers
-	providerMap := make(map[string]bool)
-	for _, baseService := range baseServices {
-		providerMap[baseService.Provider.ProviderName] = true
-	}
-	for _, service := range services {
-		providerMap[service.Provider.ProviderName] = true
-	}
-
-	providers := make([]string, 0, len(providerMap))
-	for provider := range providerMap {
-		providers = append(providers, provider)
-	}
-
-	return providers, baseServices, services
 }
