@@ -26,6 +26,8 @@ var (
 	elevenlabsAPIKey  string
 	elenvlabsModelID  string
 	elevenlabsVoiceID string
+
+	elevenlabs_setup bool
 )
 
 type ElevenLabsResponse struct {
@@ -38,16 +40,20 @@ type ElevenLabsResponse struct {
 }
 
 func RegisterElevenlabs(baseServices *[]structures.BaseService, services *[]structures.Service) {
-	elevenlabsSetup()
-
 	*baseServices = append(*baseServices, structures.BaseService{
 		Provider:    elevenlabsProvider,
 		ServiceType: structures.TTS_SERVICE,
 		Run:         elevenlabsTTS,
+		Setup:       elevenlabsSetup,
 	})
 }
 
 func elevenlabsSetup() {
+	if elevenlabs_setup {
+		return
+	}
+	elevenlabs_setup = true
+
 	cfg := config.GetProviderConfig(elevenlabsProviderName)
 	if cfg == nil {
 		cfg = &structures.ProviderConfig{

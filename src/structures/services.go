@@ -1,13 +1,15 @@
 package structures
 
 type ServiceFunction func(client *Client, data []byte)
+type ServiceSetupFunction func()
 type Service struct {
 	Provider Provider
 
 	Name        string
 	Description string
 
-	Run ServiceFunction
+	Run   ServiceFunction
+	Setup ServiceSetupFunction
 }
 
 const (
@@ -23,7 +25,8 @@ type BaseService struct {
 
 	ServiceType int
 
-	Run ServiceFunction
+	Run   ServiceFunction
+	Setup ServiceSetupFunction
 }
 
 type Provider struct {

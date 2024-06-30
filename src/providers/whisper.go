@@ -23,15 +23,16 @@ var whisperProvider = structures.Provider{
 // Config variables
 var (
 	whisper_model string
+
+	whisper_setup bool
 )
 
 func RegisterWhisper(baseServices *[]structures.BaseService, services *[]structures.Service) {
-	whisperSetup()
-
 	*baseServices = append(*baseServices, structures.BaseService{
 		Provider:    whisperProvider,
 		ServiceType: structures.SPEECH_SERVICE,
 		Run:         whisperSpeech,
+		Setup:       whisperSetup,
 	})
 }
 
@@ -117,6 +118,11 @@ func whisperSpeech(client *structures.Client, data []byte) {
 }
 
 func whisperSetup() {
+	if whisper_setup {
+		return
+	}
+	whisper_setup = true
+
 	cfg := config.GetProviderConfig(whisperProviderName)
 	if cfg == nil {
 		cfg = &structures.ProviderConfig{

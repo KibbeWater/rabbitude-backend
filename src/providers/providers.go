@@ -122,6 +122,23 @@ func InstallServices() {
 		}
 	}
 
+	// Run setups
+	if config.ServiceBase != nil {
+		config.ServiceBase.Setup()
+	}
+	if config.BaseSpeech != nil {
+		config.BaseSpeech.Setup()
+	}
+	if config.BaseTTS != nil {
+		config.BaseTTS.Setup()
+	}
+	if config.BaseLLM != nil {
+		config.BaseLLM.Setup()
+	}
+	if config.BaseSearch != nil {
+		config.BaseSearch.Setup()
+	}
+
 	config.SaveConfig()
 
 	// Find unique service types
@@ -130,6 +147,7 @@ func InstallServices() {
 		serviceTypes = append(serviceTypes, service.Name)
 	}
 
+	// TODO: Look this over, we do not have custom services implemented yet so can't properly test
 	// Render the setting page
 	for _, serviceType := range serviceTypes {
 		providers := findProvidersByTypeName(serviceType, config.CustomServices)

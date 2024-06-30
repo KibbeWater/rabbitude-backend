@@ -25,22 +25,23 @@ var ollamaProvider = structures.Provider{
 var (
 	ollama_quick_model string
 	ollama_deep_model  string
+	ollama_setup       bool = false
 )
 
 // Returns (BaseServices, CustomServices)
 func RegisterOllama(baseServices *[]structures.BaseService, services *[]structures.Service) {
-	ollamaSetup()
-
 	*baseServices = append(*baseServices, structures.BaseService{
 		Provider:    ollamaProvider,
 		ServiceType: structures.BASE_SERVICE,
 		Run:         ollamaBase,
+		Setup:       ollamaSetup,
 	})
 
 	*baseServices = append(*baseServices, structures.BaseService{
 		Provider:    ollamaProvider,
 		ServiceType: structures.LLM_SERVICE,
 		Run:         ollamaLLM,
+		Setup:       ollamaSetup,
 	})
 
 	*services = append(*services, structures.Service{
@@ -48,10 +49,16 @@ func RegisterOllama(baseServices *[]structures.BaseService, services *[]structur
 		Name:        "uber",
 		Description: "Orders a taxi given a location",
 		Run:         runUber,
+		Setup:       ollamaSetup,
 	})
 }
 
 func ollamaSetup() {
+	if ollama_setup {
+		return
+	}
+	ollama_setup = true
+
 	cfg := config.GetProviderConfig(ollamaProviderName)
 	if cfg == nil {
 		cfg = &structures.ProviderConfig{
