@@ -42,17 +42,16 @@ type UserTextRequest struct {
 	} `json:"kernel"`
 }
 
-type AssistantResponse struct {
-	Kernel struct {
-		Response string `json:"assistantResponse"`
-	} `json:"kernel"`
-}
+const (
+	VOICE_ACTIVITY_PRESSED  string = "pttButtonPressed"
+	VOICE_ACTIVITY_RELEASED string = "pttButtonReleased"
+	VOICE_ACTIVITY_INACTIVE string = "inactive"
+)
 
-type AssistantDeviceResponse struct {
+type VoiceActivityRequest struct {
 	Kernel struct {
-		AssistantResponseDevice struct {
-			Text  string `json:"text"`
-			Audio string `json:"audio"`
-		} `json:"assistantResponseDevice"`
+		VoiceActivity struct {
+			State string `json:"state"`
+		} `json:"voiceActivity"`
 	} `json:"kernel"`
 }

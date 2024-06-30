@@ -1,9 +1,10 @@
-package utils
+package config
 
 import (
 	"encoding/json"
 	"main/structures"
 	"os"
+	"path/filepath"
 )
 
 type Config = structures.Config
@@ -33,7 +34,7 @@ func SaveConfig() {
 		return
 	}
 
-	exeDir, err := GetExecutableDir()
+	exeDir, err := getExecutableDir()
 	if err != nil {
 		return
 	}
@@ -48,7 +49,7 @@ func SaveConfig() {
 }
 
 func loadConfig() {
-	exeDir, err := GetExecutableDir()
+	exeDir, err := getExecutableDir()
 	if err != nil {
 		return
 	}
@@ -76,9 +77,38 @@ func loadConfig() {
 	ConfigData = &cfg
 }
 
+func GetProviderConfig(provider string) *structures.ProviderConfig {
+	config := GetConfig()
+
+	for _, providerConfig := range config.Providers {
+		if providerConfig.ProviderName == provider {
+			return &providerConfig
+		}
+	}
+
+	return nil
+}
+
+func SaveProviderConfig(providerConfig *structures.ProviderConfig) {
+	config := GetConfig()
+
+	for i, pc := range config.Providers {
+		if pc.ProviderName == providerConfig.ProviderName {
+			config.Providers[i] = *providerConfig
+			SaveConfig()
+			return
+		}
+	}
+
+	config.Providers = append(config.Providers, *providerConfig)
+	SaveConfig()
+}
+
 func defaultConfig() *Config {
 	return &Config{
+		Version: 1,
 		General: structures.GeneralConfig{
+			Port:           8080,
 			BaseProvider:   "",
 			LLMProvider:    "",
 			SpeechProvider: "",
@@ -86,4 +116,12 @@ func defaultConfig() *Config {
 			SearchProvider: "",
 		},
 	}
+}
+
+func getExecutableDir() (string, error) {
+	exePath, err := os.Executable()
+	if err != nil {
+		return "", err
+	}
+	return filepath.Dir(exePath), nil
 }

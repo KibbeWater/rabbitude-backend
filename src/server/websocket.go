@@ -1,10 +1,13 @@
-package api
+package server
 
 import (
 	"encoding/json"
 	"log"
+	"main/communication"
+	"main/config"
 	"main/structures"
 	"net/http"
+	"strconv"
 
 	"github.com/gorilla/websocket"
 )
@@ -66,19 +69,25 @@ func parseJson(msg []byte, client structures.Client) {
 
 	// is the top-level object key "global" exists?
 	if _, ok := jsonMap["global"]; ok {
-		HandleGlobal(req)
+		communication.HandleGlobal(req)
 		return
 	}
 
 	// is the top-level object key "kernel" exists?
 	if _, ok := jsonMap["kernel"]; ok {
-		HandleKernel(req)
+		communication.HandleKernel(req)
 		return
 	}
 }
 
 func StartServer() {
-	portNumber := "8080"
+	configData := config.GetConfig()
+	if configData.General.Port == 0 {
+		configData.General.Port = 8080
+		config.SaveConfig()
+	}
+
+	portNumber := configData.General.Port
 
 	webSocketHandler := webSocketHandler{
 		upgrader: websocket.Upgrader{
@@ -88,6 +97,6 @@ func StartServer() {
 		},
 	}
 	http.Handle("/", webSocketHandler)
-	log.Print("Starting server on port " + portNumber)
-	log.Fatal(http.ListenAndServe("localhost:"+portNumber, nil))
+	log.Print("Starting server on port " + strconv.Itoa(portNumber))
+	log.Fatal(http.ListenAndServe("localhost:"+strconv.Itoa(portNumber), nil))
 }

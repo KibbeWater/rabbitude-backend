@@ -1,8 +1,8 @@
-package services
+package providers
 
 import (
 	"fmt"
-	"main/services/providers"
+	"main/config"
 	"main/structures"
 	"main/utils"
 	"strings"
@@ -11,24 +11,14 @@ import (
 type Service = structures.Service
 type BaseService = structures.BaseService
 
-var (
-	ServiceBase *BaseService
-	BaseSpeech  *BaseService
-	BaseTTS     *BaseService
-	BaseLLM     *BaseService
-	BaseSearch  *BaseService
-
-	CustomServices []Service
-)
-
 func InstallServices() {
-	config := utils.GetConfig()
+	cfg := config.GetConfig()
 	_, baseServices, _ := DiscoverServices()
 
 	var erroredProviders []string
 
-	ServiceBase = findProvider(config.General.BaseProvider, baseServices)
-	if ServiceBase == nil {
+	config.ServiceBase = findProvider(cfg.General.BaseProvider, structures.BASE_SERVICE, baseServices)
+	if config.ServiceBase == nil {
 		providers := findProvidersByType(structures.BASE_SERVICE, baseServices)
 
 		// Get array of provider names
@@ -43,14 +33,13 @@ func InstallServices() {
 		if providerIndex < 0 {
 			erroredProviders = append(erroredProviders, "base")
 		} else {
-			ServiceBase = &providers[providerIndex]
-			println(utils.ConfigData)
-			utils.ConfigData.General.BaseProvider = ServiceBase.Provider.ProviderName
+			config.ServiceBase = &providers[providerIndex]
+			config.ConfigData.General.BaseProvider = config.ServiceBase.Provider.ProviderName
 		}
 	}
 
-	BaseSpeech = findProvider(config.General.SpeechProvider, baseServices)
-	if BaseSpeech == nil {
+	config.BaseSpeech = findProvider(cfg.General.SpeechProvider, structures.SPEECH_SERVICE, baseServices)
+	if config.BaseSpeech == nil {
 		providers := findProvidersByType(structures.SPEECH_SERVICE, baseServices)
 
 		// Get array of provider names
@@ -65,13 +54,13 @@ func InstallServices() {
 		if providerIndex < 0 {
 			erroredProviders = append(erroredProviders, "speech")
 		} else {
-			BaseSpeech = &providers[providerIndex]
-			utils.ConfigData.General.SpeechProvider = BaseSpeech.Provider.ProviderName
+			config.BaseSpeech = &providers[providerIndex]
+			config.ConfigData.General.SpeechProvider = config.BaseSpeech.Provider.ProviderName
 		}
 	}
 
-	BaseTTS = findProvider(config.General.TTSProvider, baseServices)
-	if BaseTTS == nil {
+	config.BaseTTS = findProvider(cfg.General.TTSProvider, structures.TTS_SERVICE, baseServices)
+	if config.BaseTTS == nil {
 		providers := findProvidersByType(structures.TTS_SERVICE, baseServices)
 
 		// Get array of provider names
@@ -86,13 +75,13 @@ func InstallServices() {
 		if providerIndex < 0 {
 			erroredProviders = append(erroredProviders, "tts")
 		} else {
-			BaseTTS = &providers[providerIndex]
-			utils.ConfigData.General.TTSProvider = BaseTTS.Provider.ProviderName
+			config.BaseTTS = &providers[providerIndex]
+			config.ConfigData.General.TTSProvider = config.BaseTTS.Provider.ProviderName
 		}
 	}
 
-	BaseLLM = findProvider(config.General.LLMProvider, baseServices)
-	if BaseLLM == nil {
+	config.BaseLLM = findProvider(cfg.General.LLMProvider, structures.LLM_SERVICE, baseServices)
+	if config.BaseLLM == nil {
 		providers := findProvidersByType(structures.LLM_SERVICE, baseServices)
 
 		// Get array of provider names
@@ -107,13 +96,13 @@ func InstallServices() {
 		if providerIndex < 0 {
 			erroredProviders = append(erroredProviders, "llm")
 		} else {
-			BaseLLM = &providers[providerIndex]
-			utils.ConfigData.General.LLMProvider = BaseLLM.Provider.ProviderName
+			config.BaseLLM = &providers[providerIndex]
+			config.ConfigData.General.LLMProvider = config.BaseLLM.Provider.ProviderName
 		}
 	}
 
-	BaseSearch = findProvider(config.General.SearchProvider, baseServices)
-	if BaseSearch == nil {
+	config.BaseSearch = findProvider(cfg.General.SearchProvider, structures.SEARCH_SERVICE, baseServices)
+	if config.BaseSearch == nil {
 		providers := findProvidersByType(structures.SEARCH_SERVICE, baseServices)
 
 		// Get array of provider names
@@ -128,22 +117,22 @@ func InstallServices() {
 		if providerIndex < 0 {
 			erroredProviders = append(erroredProviders, "search")
 		} else {
-			BaseSearch = &providers[providerIndex]
-			utils.ConfigData.General.SearchProvider = BaseSearch.Provider.ProviderName
+			config.BaseSearch = &providers[providerIndex]
+			config.ConfigData.General.SearchProvider = config.BaseSearch.Provider.ProviderName
 		}
 	}
 
-	utils.SaveConfig()
+	config.SaveConfig()
 
 	// Find unique service types
 	serviceTypes := []string{}
-	for _, service := range CustomServices {
+	for _, service := range config.CustomServices {
 		serviceTypes = append(serviceTypes, service.Name)
 	}
 
 	// Render the setting page
 	for _, serviceType := range serviceTypes {
-		providers := findProvidersByTypeName(serviceType, CustomServices)
+		providers := findProvidersByTypeName(serviceType, config.CustomServices)
 
 		// Get array of provider names
 		var providerNames []string
@@ -158,7 +147,7 @@ func InstallServices() {
 			continue
 		} else {
 			// Add to custom services
-			CustomServices = append(CustomServices, providers[providerIndex])
+			config.CustomServices = append(config.CustomServices, providers[providerIndex])
 		}
 	}
 
@@ -167,9 +156,9 @@ func InstallServices() {
 	}
 }
 
-func findProvider(providerName string, services []BaseService) *BaseService {
+func findProvider(providerName string, serviceType int, services []BaseService) *BaseService {
 	for _, service := range services {
-		if service.Provider.ProviderName == providerName {
+		if service.Provider.ProviderName == providerName && service.ServiceType == serviceType {
 			return &service
 		}
 	}
@@ -206,7 +195,8 @@ func DiscoverServices() ([]string, []BaseService, []Service) {
 	var baseServices []BaseService
 	var services []Service
 
-	providers.RegisterOllama(&baseServices, &services)
+	RegisterOllama(&baseServices, &services)
+	RegisterElevenlabs(&baseServices, &services)
 
 	// Find all unique providers
 	providerMap := make(map[string]bool)

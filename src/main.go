@@ -1,11 +1,11 @@
 package main
 
 import (
-	"main/api"
-	"main/services"
+	"main/providers"
+	"main/server"
 )
 
 func main() {
-	services.InstallServices()
-	api.StartServer()
+	providers.InstallServices()
+	server.StartServer()
 }

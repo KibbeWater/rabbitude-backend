@@ -33,3 +33,12 @@ func RenderSettingPage(title string, options []string) int {
 
 	return input - 1
 }
+
+func GetSetupValue(text string) string {
+	fmt.Printf("%s\n Enter value: ", text)
+
+	var input string
+	fmt.Scan(&input)
+
+	return input
+}

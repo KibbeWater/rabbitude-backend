@@ -1,8 +1,9 @@
-package api
+package communication
 
 import (
 	"encoding/json"
 	"log"
+	"main/api"
 	"main/structures"
 	"strings"
 )
@@ -35,6 +36,8 @@ func HandleGlobal(req structures.ServiceRequest) {
 			}
 
 			req.Client.AccountKey = tokenParts[1]
+
+			api.SendInitResponse(req.Client)
 		}
 	}
 }
