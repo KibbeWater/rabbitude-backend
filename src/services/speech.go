@@ -23,6 +23,5 @@ func RunSpeech(client *structures.Client, audio []byte) {
 	}
 
 	api.SendSpeechRecognised(client, speechTranscript)
-	api.SendTextResponse(client, speechTranscript)
-	RunTTS(client, speechTranscript)
+	ClassifyText(client, speechTranscript)
 }
