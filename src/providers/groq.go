@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"main/api"
 	"main/config"
-	"main/services"
 	"main/structures"
 	"main/utils"
 	"net/http"
@@ -156,7 +154,7 @@ func makeGroqRequest(model string, system_prompt string, prompt string) string {
 	return completion
 }
 
-func groqLLM(client *structures.Client, data []byte) {
+func groqLLM(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
 	system_prompt := "You are an AI powered voice assistant called \"Rabbit\", you are a hardware AI assistant running a specialized OS created by \"Rabbitude\" a modding and jailbreaking community looking to improve the Rabbit R1 hardware AI assistant."
 	system_prompt = fmt.Sprintf("%s\nSimilar to Siri, you are to respond in a conversational but concise manner. Do not use emojis", system_prompt)
 
@@ -166,11 +164,10 @@ func groqLLM(client *structures.Client, data []byte) {
 
 	fmt.Println("Completion: ", completion)
 
-	api.SendTextResponse(client, completion)
-	services.RunTTS(client, completion)
+	return []byte(completion), nil
 }
 
-func groqBase(client *structures.Client, data []byte) {
+func groqBase(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
 	system_prompt := utils.BuildClassificationPrompt("Your responses should only contain the name of a given service")
 
 	prompt := string(data)
@@ -187,24 +184,14 @@ func groqBase(client *structures.Client, data []byte) {
 		if strings.Contains(strings.ToLower(service.Name), intention) {
 			// Run custom service
 			fmt.Println("Running custom service: ", service.Name)
-			return
+			return nil, nil
 		}
 	}
 
-	if strings.Contains(intention, "llm") {
-		fmt.Println("Identified LLM service")
-		go services.RunLLM(client, prompt)
-		return
-	}
-
-	if strings.Contains(intention, "search") {
-		fmt.Println("Identified Search service")
-		go services.RunSearch(client, prompt)
-		return
-	}
+	return []byte(completion), nil
 }
 
-func groqSpeech(client *structures.Client, data []byte) {
+func groqSpeech(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
 	fmt.Println("Running Groq speech service")
 
 	// Create a HTTP post request to the Groq TTS API
@@ -266,6 +253,7 @@ func groqSpeech(client *structures.Client, data []byte) {
 		completion = text
 	}
 
-	api.SendSpeechRecognised(client, completion)
-	services.ClassifyText(client, completion)
+	fmt.Println("Completion: ", completion)
+
+	return []byte(completion), nil
 }
