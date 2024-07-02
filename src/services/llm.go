@@ -2,6 +2,7 @@ package services
 
 import (
 	"fmt"
+	"main/api"
 	"main/config"
 	"main/structures"
 )
@@ -17,5 +18,21 @@ func RunLLM(client *structures.Client, text string) {
 	}
 
 	fmt.Println("Running LLM on text: ", text)
-	config.BaseLLM.Run(client, []byte(text))
+	var preventDef bool
+	ret, err := config.BaseLLM.Run(client, []byte(text), &preventDef)
+	if err != nil {
+		fmt.Println("Error running LLM service: ", err)
+		return
+	}
+	promptReturn := string(ret)
+
+	fmt.Println("LLM service returned: ", promptReturn)
+
+	if preventDef {
+		return
+	}
+
+	// Send the response back to the client
+	api.SendTextResponse(client, promptReturn)
+	RunTTS(client, promptReturn)
 }

@@ -1,8 +1,11 @@
 package utils
 
 import (
+	"bytes"
+	"encoding/gob"
 	"fmt"
 	"main/config"
+	"main/structures"
 	"strings"
 )
 
@@ -38,4 +41,29 @@ func FindSubstring(input, startSeq, endSeq string) (string, bool) {
 	}
 
 	return input[startIndex : startIndex+endIndex], true
+}
+
+func CreateAudioReturn(audio []byte, textMetadata string) ([]byte, error) {
+	p := structures.ProviderAudioResponse{
+		Audio:        audio,
+		TextMetadata: textMetadata,
+	}
+	var buffer bytes.Buffer
+	encoder := gob.NewEncoder(&buffer)
+	err := encoder.Encode(p)
+	if err != nil {
+		return nil, err
+	}
+	return buffer.Bytes(), nil
+}
+
+func ReadAudioReturn(audio []byte) (structures.ProviderAudioResponse, error) {
+	var p structures.ProviderAudioResponse
+	buffer := bytes.NewBuffer(audio)
+	decoder := gob.NewDecoder(buffer)
+	err := decoder.Decode(&p)
+	if err != nil {
+		return p, err
+	}
+	return p, nil
 }

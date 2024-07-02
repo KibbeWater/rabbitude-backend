@@ -1,6 +1,7 @@
 package structures
 
 type ServiceFunction func(client *Client, data []byte)
+type BaseServiceFunction func(client *Client, data []byte, preventDef *bool) ([]byte, error)
 type ServiceSetupFunction func()
 type Service struct {
 	Provider Provider
@@ -25,10 +26,15 @@ type BaseService struct {
 
 	ServiceType int
 
-	Run   ServiceFunction
+	Run   BaseServiceFunction
 	Setup ServiceSetupFunction
 }
 
 type Provider struct {
 	ProviderName string
+}
+
+type ProviderAudioResponse struct {
+	TextMetadata string
+	Audio        []byte
 }

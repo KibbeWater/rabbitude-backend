@@ -6,7 +6,6 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"main/api"
 	"main/config"
 	"main/structures"
 	"main/utils"
@@ -79,7 +78,8 @@ func elevenlabsSetup() {
 	config.SaveProviderConfig(cfg)
 }
 
-func elevenlabsTTS(client *structures.Client, data []byte) {
+// TODO: Use the websocket API and change this to stream audio to the client instead, in result, shortening time to first byte
+func elevenlabsTTS(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
 	text := string(data)
 
 	// Create a HTTP post request to the ElevenLabs TTS API
@@ -234,5 +234,11 @@ func elevenlabsTTS(client *structures.Client, data []byte) {
 	os.Remove(audioPath)
 	os.Remove(newAudioPath)
 
-	api.SendAudioResponse(client, audioBytes, string(characterDataJson))
+	// create return data
+	retData, err := utils.CreateAudioReturn(audioBytes, string(characterDataJson))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	return retData, nil
 }

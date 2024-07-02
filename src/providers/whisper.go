@@ -5,9 +5,7 @@ import (
 	"fmt"
 	"io"
 	"log"
-	"main/api"
 	"main/config"
-	"main/services"
 	"main/structures"
 	"main/utils"
 	"net/http"
@@ -36,20 +34,18 @@ func RegisterWhisper(baseServices *[]structures.BaseService, services *[]structu
 	})
 }
 
-func whisperSpeech(client *structures.Client, data []byte) {
+func whisperSpeech(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
 	filename := utils.GenerateUniqueID() + ".wav"
 	exeDir, err := utils.GetExecutableDir()
 	if err != nil {
-		log.Println("Error getting executable directory:", err)
-		return
+		return nil, fmt.Errorf(fmt.Sprintf("Error getting executable directory: %s", err))
 	}
 
 	filePath := fmt.Sprintf("%s/%s", exeDir, filename)
 
 	// Save the audio to a file
 	if err := os.WriteFile(filePath, data, 0644); err != nil {
-		log.Println("Error writing audio to file:", err)
-		return
+		return nil, fmt.Errorf(fmt.Sprintf("Error writing audio to file: %s", err))
 	}
 
 	body := map[string]interface{}{
@@ -58,17 +54,15 @@ func whisperSpeech(client *structures.Client, data []byte) {
 
 	bodyJSON, err := json.Marshal(body)
 	if err != nil {
-		log.Println("Error marshalling JSON:", err)
 		os.Remove(filePath)
-		return
+		return nil, fmt.Errorf(fmt.Sprintf("Error marshalling JSON: %s", err))
 	}
 
 	// Make the request
 	req, err := utils.CreatePostRequest("http://localhost:8118/api/whisper", string(bodyJSON), nil)
 	if err != nil {
-		fmt.Println("Error creating request:", err)
 		os.Remove(filePath)
-		return
+		return nil, fmt.Errorf(fmt.Sprintf("Error creating request: %s", err))
 	}
 
 	// Send the request
@@ -113,8 +107,7 @@ func whisperSpeech(client *structures.Client, data []byte) {
 
 	message := response["message"].(string)
 
-	api.SendSpeechRecognised(client, message)
-	services.ClassifyText(client, message)
+	return []byte(message), nil
 }
 
 func whisperSetup() {

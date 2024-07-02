@@ -6,7 +6,6 @@ import (
 	"log"
 	"main/api"
 	"main/config"
-	"main/services"
 	"main/structures"
 	"main/utils"
 	"strings"
@@ -82,7 +81,7 @@ func ollamaSetup() {
 	config.SaveProviderConfig(cfg)
 }
 
-func ollamaBase(client *structures.Client, data []byte) {
+func ollamaBase(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
 	text := string(data)
 
 	fmt.Println("Running Ollama base service")
@@ -108,7 +107,7 @@ func ollamaBase(client *structures.Client, data []byte) {
 	intention, found := utils.FindSubstring(completion, "&s", "&e")
 	if !found {
 		api.SendTextResponse(client, "I'm not sure what you're asking")
-		return
+		return nil, nil
 	}
 
 	intention = strings.ToLower(intention)
@@ -118,24 +117,14 @@ func ollamaBase(client *structures.Client, data []byte) {
 		if strings.Contains(strings.ToLower(service.Name), intention) {
 			// Run custom service
 			fmt.Println("Running custom service: ", service.Name)
-			return
+			return nil, fmt.Errorf("feature not implemented")
 		}
 	}
 
-	if strings.Contains(intention, "llm") {
-		fmt.Println("Identified LLM service")
-		go services.RunLLM(client, text)
-		return
-	}
-
-	if strings.Contains(intention, "search") {
-		fmt.Println("Identified Search service")
-		go services.RunSearch(client, text)
-		return
-	}
+	return []byte(text), nil
 }
 
-func ollamaLLM(client *structures.Client, data []byte) {
+func ollamaLLM(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
 	text := string(data)
 
 	fmt.Println("Running Ollama LLM service")
@@ -158,8 +147,7 @@ func ollamaLLM(client *structures.Client, data []byte) {
 
 	fmt.Println("Completion: ", completion)
 
-	api.SendTextResponse(client, completion)
-	services.RunTTS(client, completion)
+	return []byte(completion), nil
 }
 
 func runUber(client *structures.Client, data []byte) {
