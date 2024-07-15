@@ -108,12 +108,13 @@ func defaultConfig() *Config {
 	return &Config{
 		Version: 1,
 		General: structures.GeneralConfig{
-			Port:           8080,
-			BaseProvider:   "",
-			LLMProvider:    "",
-			SpeechProvider: "",
-			TTSProvider:    "",
-			SearchProvider: "",
+			Port:               8080,
+			BaseProvider:       "",
+			LLMProvider:        "",
+			SpeechProvider:     "",
+			TTSProvider:        "",
+			SearchProvider:     "",
+			GenerativeProvider: "",
 		},
 	}
 }

@@ -43,6 +43,13 @@ func RegisterOllama(baseServices *[]structures.BaseService, services *[]structur
 		Setup:       ollamaSetup,
 	})
 
+	*baseServices = append(*baseServices, structures.BaseService{
+		Provider:    ollamaProvider,
+		ServiceType: structures.GENERATIVE_SERVICE,
+		Run:         ollamaGen,
+		Setup:       ollamaSetup,
+	})
+
 	*services = append(*services, structures.Service{
 		Provider:    ollamaProvider,
 		Name:        "uber",
@@ -141,6 +148,26 @@ func ollamaLLM(client *structures.Client, data []byte, preventDef *bool) ([]byte
 
 	ctx := context.Background()
 	completion, err := llms.GenerateFromSinglePrompt(ctx, llm, query)
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	fmt.Println("Completion: ", completion)
+
+	return []byte(completion), nil
+}
+
+func ollamaGen(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
+	text := string(data)
+
+	fmt.Println("Running Ollama Generative service")
+	llm, err := ollama.New(ollama.WithModel(ollama_deep_model))
+	if err != nil {
+		log.Fatal(err)
+	}
+
+	ctx := context.Background()
+	completion, err := llms.GenerateFromSinglePrompt(ctx, llm, text)
 	if err != nil {
 		log.Fatal(err)
 	}

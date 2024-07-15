@@ -14,11 +14,12 @@ type Service struct {
 }
 
 const (
-	BASE_SERVICE   int = 0
-	SPEECH_SERVICE int = 1
-	TTS_SERVICE    int = 2
-	LLM_SERVICE    int = 3
-	SEARCH_SERVICE int = 4
+	BASE_SERVICE       int = 0
+	SPEECH_SERVICE     int = 1
+	TTS_SERVICE        int = 2
+	LLM_SERVICE        int = 3
+	SEARCH_SERVICE     int = 4
+	GENERATIVE_SERVICE int = 5
 )
 
 type BaseService struct {

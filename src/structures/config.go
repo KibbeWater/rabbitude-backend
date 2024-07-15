@@ -10,11 +10,12 @@ type Config struct {
 type GeneralConfig struct {
 	Port int `json:"port"`
 
-	BaseProvider   string `json:"base_provider"`
-	LLMProvider    string `json:"llm_provider"`
-	SpeechProvider string `json:"speech_provider"`
-	TTSProvider    string `json:"tts_provider"`
-	SearchProvider string `json:"search_provider"`
+	BaseProvider       string `json:"base_provider"`
+	LLMProvider        string `json:"llm_provider"`
+	SpeechProvider     string `json:"speech_provider"`
+	TTSProvider        string `json:"tts_provider"`
+	SearchProvider     string `json:"search_provider"`
+	GenerativeProvider string `json:"generative_provider"`
 }
 
 type ServiceConfig struct {

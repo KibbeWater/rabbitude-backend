@@ -6,11 +6,12 @@ type Service = structures.Service
 type BaseService = structures.BaseService
 
 var (
-	ServiceBase *BaseService
-	BaseSpeech  *BaseService
-	BaseTTS     *BaseService
-	BaseLLM     *BaseService
-	BaseSearch  *BaseService
+	ServiceBase    *BaseService
+	BaseSpeech     *BaseService
+	BaseTTS        *BaseService
+	BaseLLM        *BaseService
+	BaseSearch     *BaseService
+	BaseGenerative *BaseService
 
 	CustomServices []Service
 )

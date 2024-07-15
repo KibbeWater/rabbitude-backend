@@ -44,6 +44,13 @@ func RegisterGroq(baseServices *[]structures.BaseService, services *[]structures
 
 	*baseServices = append(*baseServices, structures.BaseService{
 		Provider:    groqProvider,
+		ServiceType: structures.GENERATIVE_SERVICE,
+		Run:         groqGen,
+		Setup:       groqSetup,
+	})
+
+	*baseServices = append(*baseServices, structures.BaseService{
+		Provider:    groqProvider,
 		ServiceType: structures.SPEECH_SERVICE,
 		Run:         groqSpeech,
 		Setup:       groqSetup,
@@ -89,12 +96,22 @@ func groqSetup() {
 
 func makeGroqRequest(model string, system_prompt string, prompt string) string {
 	// body: {"model": model, messages: [{role: "system", "content": system_prompt}, {role: "user", "content": prompt}]}
-	body := map[string]interface{}{
-		"model": model,
-		"messages": []map[string]interface{}{
-			{"role": "system", "content": system_prompt},
-			{"role": "user", "content": prompt},
-		},
+	var body map[string]interface{}
+	if system_prompt == "" {
+		body = map[string]interface{}{
+			"model": model,
+			"messages": []map[string]interface{}{
+				{"role": "user", "content": prompt},
+			},
+		}
+	} else {
+		body = map[string]interface{}{
+			"model": model,
+			"messages": []map[string]interface{}{
+				{"role": "system", "content": system_prompt},
+				{"role": "user", "content": prompt},
+			},
+		}
 	}
 
 	// Marshal the body
@@ -161,6 +178,16 @@ func groqLLM(client *structures.Client, data []byte, preventDef *bool) ([]byte, 
 	prompt := string(data)
 
 	completion := makeGroqRequest(groqDeepModel, system_prompt, prompt)
+
+	fmt.Println("Completion: ", completion)
+
+	return []byte(completion), nil
+}
+
+func groqGen(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {
+	prompt := string(data)
+
+	completion := makeGroqRequest(groqDeepModel, "", prompt)
 
 	fmt.Println("Completion: ", completion)
 
