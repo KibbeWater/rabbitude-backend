@@ -121,7 +121,7 @@ func InstallServices() {
 		providerIndex := utils.RenderSettingPage("Select a LLM provider", providerNames)
 
 		if providerIndex < 0 {
-			erroredProviders = append(erroredProviders, "llm")
+			erroredProviders = append(erroredProviders, "lang")
 		} else {
 			config.BaseLLM = &providers[providerIndex]
 			config.ConfigData.General.LLMProvider = config.BaseLLM.Provider.ProviderName
@@ -149,6 +149,27 @@ func InstallServices() {
 		}
 	}
 
+	config.BaseGenerative = findProvider(cfg.General.GenerativeProvider, structures.GENERATIVE_SERVICE, baseServices)
+	if config.BaseGenerative == nil {
+		providers := findProvidersByType(structures.GENERATIVE_SERVICE, baseServices)
+
+		// Get array of provider names
+		var providerNames []string
+		for _, provider := range providers {
+			providerNames = append(providerNames, provider.Provider.ProviderName)
+		}
+
+		// Render the setting page
+		providerIndex := utils.RenderSettingPage("Select a generative provider", providerNames)
+
+		if providerIndex < 0 {
+			erroredProviders = append(erroredProviders, "generative")
+		} else {
+			config.BaseGenerative = &providers[providerIndex]
+			config.ConfigData.General.GenerativeProvider = config.BaseGenerative.Provider.ProviderName
+		}
+	}
+
 	// Run setups
 	if config.ServiceBase != nil {
 		config.ServiceBase.Setup()
@@ -164,6 +185,9 @@ func InstallServices() {
 	}
 	if config.BaseSearch != nil {
 		config.BaseSearch.Setup()
+	}
+	if config.BaseGenerative != nil {
+		config.BaseGenerative.Setup()
 	}
 
 	config.SaveConfig()

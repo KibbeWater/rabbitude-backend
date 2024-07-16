@@ -24,14 +24,29 @@ func (wsh webSocketHandler) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
+	// Check if request header "device-id" exists, if so, set variable "imei" to the value of the header
+	imei := r.Header.Get("deviceId")
+	fmt.Println("Received connection from device: ", imei)
+
+	// TODO: We need a DB to store persistent client data
 	client := structures.Client{
-		Conn:       ws,
-		Imei:       "",
-		AccountKey: "",
-		IsLoggedIn: false,
+		Conn:            ws,
+		Imei:            imei,
+		AccountKey:      "",
+		DashboardAPIURL: "",
+		IsLoggedIn:      false,
 	}
 
-	go handleMessages(&client)
+	fmt.Printf("New connection, created client: %+v\n", client)
+
+	// Append the client to the list of clients
+	communication.Clients = append(communication.Clients, client)
+
+	// Get the pointer to the client
+	clientPtr := &communication.Clients[len(communication.Clients)-1]
+
+	// Our client is now mutable, yippie!
+	go handleMessages(clientPtr)
 }
 
 func handleMessages(client *structures.Client) {

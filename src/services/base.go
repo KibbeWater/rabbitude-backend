@@ -75,7 +75,7 @@ func sendAckResponse(client *structures.Client, responses []string) {
 }
 
 // Classifies which Service to be used to fullfill the request
-func ClassifyText(client *structures.Client, text string) {
+func ClassifyText(client *structures.Client, text string, speechRecognised bool) {
 	fmt.Println("Classifying text: ", text)
 
 	fmt.Println("ServiceBase: ", config.ServiceBase)
@@ -98,10 +98,10 @@ func ClassifyText(client *structures.Client, text string) {
 		return
 	}
 
-	if strings.Contains(classifiedText, "llm") {
+	if strings.Contains(classifiedText, "lang") {
 		fmt.Println("Running LLM service")
 		go sendAckResponse(client, llmAckResponses)
-		RunLLM(client, text)
+		RunLLM(client, text, speechRecognised)
 		return
 	}
 

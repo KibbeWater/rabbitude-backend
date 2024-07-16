@@ -128,7 +128,7 @@ func ollamaBase(client *structures.Client, data []byte, preventDef *bool) ([]byt
 		}
 	}
 
-	return []byte(text), nil
+	return []byte(intention), nil
 }
 
 func ollamaLLM(client *structures.Client, data []byte, preventDef *bool) ([]byte, error) {

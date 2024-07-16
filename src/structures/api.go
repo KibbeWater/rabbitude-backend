@@ -9,6 +9,9 @@ type Client struct {
 	Imei       string
 	AccountKey string
 
+	UNVERIFIED      bool
+	DashboardAPIURL string
+
 	IsLoggedIn bool
 	AudioBuf   []byte
 }
@@ -34,6 +37,24 @@ type LoginRequest struct {
 			TimeZone string `json:"timeZone"`
 			Token    string `json:"token"`
 		} `json:"initialize"`
+	} `json:"global"`
+}
+
+type WebAuthRequest struct {
+	Global struct {
+		WebAuthenticate struct {
+			Key     string `json:"key"`
+			API_URL string `json:"api_url"`
+		} `json:"web_authenticate"`
+	} `json:"global"`
+}
+
+type WebAuthResponse struct {
+	Global struct {
+		WebAuthenticate struct {
+			Success bool   `json:"success"`
+			Error   string `json:"error"`
+		} `json:"web_authenticate"`
 	} `json:"global"`
 }
 

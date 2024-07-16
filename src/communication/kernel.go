@@ -32,7 +32,7 @@ func HandleKernel(req ServiceRequest) {
 
 			log.Printf("User text: %s", userTextReq.Kernel.UserText.Text)
 
-			go services.ClassifyText(req.Client, userTextReq.Kernel.UserText.Text)
+			go services.ClassifyText(req.Client, userTextReq.Kernel.UserText.Text, false)
 		case "voiceActivity":
 			var voiceActivityReq structures.VoiceActivityRequest
 			err := json.Unmarshal(req.Data, &voiceActivityReq)

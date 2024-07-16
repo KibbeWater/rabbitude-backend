@@ -12,7 +12,7 @@ import (
 func BuildClassificationPrompt(return_prompt string) string {
 	var serviceList []string
 	if config.BaseLLM != nil {
-		serviceList = append(serviceList, "* LLM - Use large language models with advanced reasoning capabilities with no online dependencies")
+		serviceList = append(serviceList, "* Lang - Use large language models with advanced reasoning capabilities with no online dependencies")
 	}
 	if config.BaseSearch != nil {
 		serviceList = append(serviceList, "* Search - AI powered search engines for when the AI requires information from the web")

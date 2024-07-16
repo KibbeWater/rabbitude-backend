@@ -39,7 +39,6 @@ func GetCacheDir() (string, error) {
 		return "", err
 	}
 	return cacheDir, nil
-
 }
 
 func CreateHash(data []byte) string {

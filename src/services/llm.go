@@ -5,9 +5,10 @@ import (
 	"main/api"
 	"main/config"
 	"main/structures"
+	"main/utils"
 )
 
-func RunLLM(client *structures.Client, text string) {
+func RunLLM(client *structures.Client, text string, speechRecognised bool) {
 	fmt.Println("Running LLM service")
 	fmt.Println("BaseLLM: ", config.BaseLLM)
 	fmt.Println("ServiceBase: ", config.ServiceBase)
@@ -33,6 +34,7 @@ func RunLLM(client *structures.Client, text string) {
 	}
 
 	// Send the response back to the client
+	go utils.SendTextEntry(client, text, promptReturn, speechRecognised)
 	api.SendTextResponse(client, promptReturn)
 	RunTTS(client, promptReturn)
 }
