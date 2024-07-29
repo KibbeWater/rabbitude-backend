@@ -120,5 +120,5 @@ func StartServer() {
 	}
 	http.Handle("/", webSocketHandler)
 	log.Print("Starting server on port " + strconv.Itoa(portNumber))
-	log.Fatal(http.ListenAndServe("localhost:"+strconv.Itoa(portNumber), nil))
+	log.Fatal(http.ListenAndServe("0.0.0.0:"+strconv.Itoa(portNumber), nil))
 }
