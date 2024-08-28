@@ -65,5 +65,8 @@ func HandleKernel(req ServiceRequest) {
 
 func runAudioService(client *structures.Client) {
 	audioBuf := utils.MergeAudioBuffer(client.AudioBuf)
+	if audioBuf == nil {
+		return
+	}
 	services.RunSpeech(client, audioBuf)
 }
