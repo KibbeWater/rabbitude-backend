@@ -13,7 +13,8 @@ type Client struct {
 	DashboardAPIURL string
 
 	IsLoggedIn bool
-	AudioBuf   []byte
+
+	AudioBuf [][]byte
 }
 
 type ServiceRequest struct {

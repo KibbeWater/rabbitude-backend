@@ -6,6 +6,7 @@ import (
 	"log"
 	"main/services"
 	"main/structures"
+	"main/utils"
 )
 
 type ServiceRequest = structures.ServiceRequest
@@ -51,13 +52,18 @@ func HandleKernel(req ServiceRequest) {
 
 			if voiceState == structures.VOICE_ACTIVITY_PRESSED {
 				fmt.Println("Clearing audio buffer, voice activity pressed")
-				req.Client.AudioBuf = []byte{}
+				req.Client.AudioBuf = [][]byte{}
 			}
 
 			if voiceState == structures.VOICE_ACTIVITY_RELEASED {
 				fmt.Println("Sending audio response")
-				go services.RunSpeech(req.Client, req.Client.AudioBuf)
+				go runAudioService(req.Client)
 			}
 		}
 	}
+}
+
+func runAudioService(client *structures.Client) {
+	audioBuf := utils.MergeAudioBuffer(client.AudioBuf)
+	services.RunSpeech(client, audioBuf)
 }
