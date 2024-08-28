@@ -13,6 +13,6 @@ func HandleAudioData(client *structures.Client, audio []byte) {
 
 	fmt.Println("Received audio data from client")
 	bufLen := len(client.AudioBuf)
-	client.AudioBuf = append(client.AudioBuf, audio...)
+	client.AudioBuf = append(client.AudioBuf, audio)
 	fmt.Println("Audio buffer length", bufLen, "->", len(client.AudioBuf))
 }
