@@ -27,7 +27,11 @@ func main() {
 	if external.Apple_IsLoaded() {
 		fmt.Println("Apple lib loaded")
 		// external.Apple_Greet("Swift")
-		external.Apple_Greet()
+		ret, err := external.Apple_Greet("Swift")
+		if err != nil {
+			fmt.Println("Error from swift_greet:", err)
+		}
+		fmt.Println("Result from swift_greet:", ret)
 	} else {
 		fmt.Println("Apple lib not loaded")
 	}

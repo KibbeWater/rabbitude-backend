@@ -15,14 +15,14 @@ import (
 #include <stdlib.h>
 #include <dlfcn.h>
 
-typedef int (*swift_greet_func)();
+typedef char* (*swift_greet_func)(const char*);
 
-static int call_swift_greet(void *handle) {
+static char* call_swift_greet(void *handle, const char *name) {
     swift_greet_func greet = (swift_greet_func)dlsym(handle, "swift_greet");
     if (greet == NULL) {
-        return -1;
+        return 0;
     }
-    return greet();
+    return greet(name);
 }
 */
 import "C"
@@ -53,17 +53,14 @@ func Apple_IsLoaded() bool {
 }
 
 // Function to call swift_greet from apple.dylib
-func Apple_Greet() {
+func Apple_Greet(name string) (string, error) {
 	if appleHandle == nil {
 		fmt.Println("Apple library not loaded")
-		return
+		return "", fmt.Errorf("Apple library not loaded")
 	}
-	result := C.call_swift_greet(appleHandle)
-	if result == -1 {
-		fmt.Println("Failed to call swift_greet")
-	} else {
-		fmt.Printf("Result from swift_greet: %d\n", result)
-	}
+	result := C.call_swift_greet(appleHandle, C.CString(name))
+	fmt.Printf("Result from swift_greet: %d\n", C.GoString(result))
+	return C.GoString(result), nil
 }
 
 func Apple_GetInterface() structures.LibraryInterface {

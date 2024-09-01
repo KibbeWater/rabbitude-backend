@@ -6,11 +6,11 @@ mkdir -p bin/plugins
 # Clean up previous builds
 echo "Cleaning up previous builds..."
 rm -rf bin/plugins/*
+rm -rf bin/apple.dylib
 
-# If on Mac, Run additional step here
+# Build Mac only binaries here
 if [[ "$OSTYPE" == "darwin"* ]]; then
   echo "Building Apple integration interface..."
-  # Run additional steps here
   swiftc -emit-library -o bin/apple.dylib libraries/apple/Sources/apple/main.swift
 fi
 
