@@ -1,43 +1,15 @@
 package main
 
 import (
-	"fmt"
 	"main/external"
 	"main/providers"
 	"main/server"
-	"main/structures"
 )
 
 func main() {
-	// Load Libraries
-	// Array of LibraryInterface
-	var libraries []structures.LibraryInterface = []structures.LibraryInterface{
-		external.Apple_GetInterface(),
-	}
+	external.LoadLibraries()
+	defer external.FreeLibraries()
 
-	// Load all the Libraries
-	for _, lib := range libraries {
-		if lib.IsAvailable {
-			fmt.Println("Loading", lib.Name)
-			lib.Load()
-		}
-	}
-
-	// Test the Apple lib
-	if external.Apple_IsLoaded() {
-		fmt.Println("Apple lib loaded")
-		// external.Apple_Greet("Swift")
-		ret, err := external.Apple_Greet("Swift")
-		if err != nil {
-			fmt.Println("Error from swift_greet:", err)
-		}
-		fmt.Println("Result from swift_greet:", ret)
-	} else {
-		fmt.Println("Apple lib not loaded")
-	}
-	return
-
-	// Start the server
 	providers.InstallServices()
 	server.StartServer()
 }

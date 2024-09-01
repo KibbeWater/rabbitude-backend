@@ -32,3 +32,21 @@ cd ..
 # done
 
 echo "Build complete."
+
+# Codesigning step
+if [[ "$OSTYPE" == "darwin"* ]]; then
+    echo "Codesigning the application..."
+    if [ -z "$DEVELOPER_ID" ]; then
+      echo "Developer ID not set. Please enter your Developer ID to sign the application."
+      echo "You can find your Developer certificate in Keychain Access. The name should be similar to 'Developer ID Application: Your Name (ABC123DEFG)'."
+      read -p "Enter your Developer ID: " DEVELOPER_ID
+    fi
+    # codesign --force --sign "$DEVELOPER_ID" --entitlements ./Info.plist bin/main
+
+    if [ -f "bin/apple.dylib" ]; then
+        echo "Codesigning apple.dylib..."
+        codesign --force --sign "$DEVELOPER_ID" --entitlements ./Info.plist bin/apple.dylib
+    fi
+
+    echo "Codesigning complete."
+fi

@@ -15,14 +15,23 @@ import (
 #include <stdlib.h>
 #include <dlfcn.h>
 
-typedef char* (*swift_greet_func)(const char*);
+typedef void (*swift_requestSpeechPermission_func)(int*);
+typedef char* (*swift_speechRecognition_func)(void*, int);
 
-static char* call_swift_greet(void *handle, const char *name) {
-    swift_greet_func greet = (swift_greet_func)dlsym(handle, "swift_greet");
-    if (greet == NULL) {
-        return 0;
+static void call_swift_requestSpeechPermissions(void *handle, int *status) {
+    swift_requestSpeechPermission_func requestSpeechPermission = (swift_requestSpeechPermission_func)dlsym(handle, "swift_requestSpeechPermissions");
+    if (requestSpeechPermission == NULL) {
+        return;
     }
-    return greet(name);
+    requestSpeechPermission(status);
+}
+
+static char* call_swift_speechRecognition(void *handle, void *data, int length) {
+    swift_speechRecognition_func speechRecognition = (swift_speechRecognition_func)dlsym(handle, "swift_speechRecognition");
+    if (speechRecognition == NULL) {
+        return NULL;
+    }
+    return speechRecognition(data, length);
 }
 */
 import "C"
@@ -53,14 +62,23 @@ func Apple_IsLoaded() bool {
 }
 
 // Function to call swift_greet from apple.dylib
-func Apple_Greet(name string) (string, error) {
+func Apple_RequestSpeechPermissions(status *int) {
+	if appleHandle == nil {
+		fmt.Println("Apple library not loaded")
+		return
+	}
+
+	C.call_swift_requestSpeechPermissions(appleHandle, (*C.int)(unsafe.Pointer(status)))
+}
+
+func Apple_SpeechRecognition(data []byte) (string, error) {
 	if appleHandle == nil {
 		fmt.Println("Apple library not loaded")
 		return "", fmt.Errorf("Apple library not loaded")
 	}
-	result := C.call_swift_greet(appleHandle, C.CString(name))
-	fmt.Printf("Result from swift_greet: %d\n", C.GoString(result))
-	return C.GoString(result), nil
+
+	ret := C.call_swift_speechRecognition(appleHandle, unsafe.Pointer(&data[0]), C.int(len(data)))
+	return C.GoString(ret), nil
 }
 
 func Apple_GetInterface() structures.LibraryInterface {

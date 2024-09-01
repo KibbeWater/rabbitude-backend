@@ -20,6 +20,7 @@ func DiscoverServices() ([]string, []BaseService, []Service) {
 	RegisterElevenlabs(&baseServices, &services)
 	RegisterWhisper(&baseServices, &services)
 	RegisterGroq(&baseServices, &services)
+	RegisterApple(&baseServices, &services)
 
 	// Find all unique providers
 	providerMap := make(map[string]bool)
