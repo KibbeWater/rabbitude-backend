@@ -7,6 +7,13 @@ mkdir -p bin/plugins
 echo "Cleaning up previous builds..."
 rm -rf bin/plugins/*
 
+# If on Mac, Run additional step here
+if [[ "$OSTYPE" == "darwin"* ]]; then
+  echo "Building Apple integration interface..."
+  # Run additional steps here
+  swiftc -emit-library -o bin/apple.dylib libraries/apple/Sources/apple/main.swift
+fi
+
 # Build main application
 echo "Building main application..."
 cd src
